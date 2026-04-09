@@ -44,14 +44,16 @@ class MultiTaskPerceptionModel(nn.Module):
         self.segmenter.load_state_dict(seg_ckpt.get("state_dict", seg_ckpt))
 
     def forward(self, x):
+        
+        mean = torch.tensor([0.485, 0.456, 0.406], device=x.device).view(1,3,1,1)
+        std = torch.tensor([0.229, 0.224, 0.225], device=x.device).view(1,3,1,1)
+        x = (x - mean) / std
 
         # ---------------- CLASSIFICATION ----------------
         cls_out = self.classifier_model(x)
 
         # ---------------- LOCALIZATION ----------------
         bbox_out = self.localizer_model(x)
-
-        # 🔥 IMPORTANT: scale bbox to image space
         _, _, H, W = x.shape
         scale = torch.tensor([W, H, W, H], device=bbox_out.device)
         bbox_out = bbox_out * scale
