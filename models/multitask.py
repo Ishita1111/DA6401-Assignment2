@@ -10,7 +10,6 @@ from models.classification import VGG11Classifier
 from models.localization import VGG11Localizer
 from models.segmentation import VGG11UNet
 
-
 class MultiTaskPerceptionModel(nn.Module):
     def __init__(self, num_breeds=37, seg_classes=3, in_channels=3):
         super().__init__()
@@ -21,13 +20,13 @@ class MultiTaskPerceptionModel(nn.Module):
         unet_path = "unet.pth"
 
         if not os.path.exists(classifier_path):
-            gdown.download(id="18tzPDAapn1Lx7qW0tA6LXBJQPu6TCudm", output=classifier_path, quiet=False)
+            gdown.download(id="1ojjWWJ-XFozoCS1Tmxk8S873-Vk6YJRP", output=classifier_path, quiet=False)
 
         if not os.path.exists(localizer_path):
-            gdown.download(id="1PjiHWfVUwMvpRz3MidyIHM0I01TJaWGU", output=localizer_path, quiet=False)
+            gdown.download(id="1REslGGryB4ph8jFy4p9m0Je5OJ1JUhgC", output=localizer_path, quiet=False)
 
         if not os.path.exists(unet_path):
-            gdown.download(id="17u9sG04y0a7_wxedLdE_JJ3m45wTFHnb", output=unet_path, quiet=False)
+            gdown.download(id="1J1gCdlC8tWJiwE7gBcCBQg5bWT_CFip", output=unet_path, quiet=False)
 
         # ---------------- LOAD MODELS ----------------
         self.classifier_model = VGG11Classifier(num_breeds, in_channels)
