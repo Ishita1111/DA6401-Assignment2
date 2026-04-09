@@ -47,13 +47,13 @@ class MultiTaskPerceptionModel(nn.Module):
         temp_cls.load_state_dict(classifier_state)
 
         self.encoder.load_state_dict(temp_cls.encoder.state_dict())
-        self.classifier = temp_cls.classifier  # exact match
+        self.classifier_model = temp_cls
 
         # ---------------- LOAD LOCALIZER ----------------
         temp_loc = VGG11Localizer(in_channels)
         temp_loc.load_state_dict(localizer_state)
 
-        self.localizer = temp_loc.regressor  # exact match
+        self.localizer_model = temp_loc
 
         # ---------------- LOAD SEGMENTATION ----------------
         self.segmenter = VGG11UNet(seg_classes, in_channels)
@@ -65,10 +65,10 @@ class MultiTaskPerceptionModel(nn.Module):
         bottleneck, feats = self.encoder(x, return_features=True)
 
         # classification
-        cls_out = self.classifier(bottleneck)
+        cls_out = self.classifier_model(x)
 
         # localization
-        bbox_out = self.localizer(bottleneck)
+        bbox_out = self.localizer(x)
 
         # 🔥 FIX: scale bbox to image size
         _, _, H, W = x.shape
