@@ -3,6 +3,9 @@
 
 import torch
 import torch.nn as nn
+import os
+import gdown
+
 
 from models.vgg11 import VGG11Encoder
 
@@ -12,6 +15,20 @@ class MultiTaskPerceptionModel(nn.Module):
 
     def __init__(self, num_breeds: int = 37, seg_classes: int = 3, in_channels: int = 3):
         super(MultiTaskPerceptionModel, self).__init__()
+        
+        # checkpoint paths
+        classifier_path = "classifier.pth"
+        localizer_path = "localizer.pth"
+        unet_path = "unet.pth"
+        
+        if not os.path.exists(classifier_path):
+            gdown.download(id="18tzPDAapn1Lx7qW0tA6LXBJQPu6TCudm", output=classifier_path, quiet=False)
+
+        if not os.path.exists(localizer_path):
+            gdown.download(id="1PjiHWfVUwMvpRz3MidyIHM0I01TJaWGU", output=localizer_path, quiet=False)
+
+        if not os.path.exists(unet_path):
+            gdown.download(id="17u9sG04y0a7_wxedLdE_JJ3m45wTFHnb", output=unet_path, quiet=False)
 
         self.encoder = VGG11Encoder(in_channels=in_channels)
 
@@ -67,6 +84,37 @@ class MultiTaskPerceptionModel(nn.Module):
             nn.Conv2d(64 + 64, 64, 3, padding=1),
             nn.ReLU(inplace=True)
         )
+        
+        # load checkpoints
+        classifier_ckpt = torch.load(classifier_path, map_location="cpu")
+        localizer_ckpt = torch.load(localizer_path, map_location="cpu")
+        unet_ckpt = torch.load(unet_path, map_location="cpu")
+
+        # handle both formats
+        classifier_state = classifier_ckpt.get("state_dict", classifier_ckpt)
+        localizer_state = localizer_ckpt.get("state_dict", localizer_ckpt)
+        unet_state = unet_ckpt.get("state_dict", unet_ckpt)
+
+        # load encoder (from classifier)
+        self.encoder.load_state_dict(
+            {k.replace("encoder.", ""): v for k, v in classifier_state.items() if k.startswith("encoder.")},
+            strict=False
+        )
+
+        # load classifier head
+        self.classifier.load_state_dict(
+            {k.replace("classifier.", ""): v for k, v in classifier_state.items() if k.startswith("classifier.")},
+            strict=False
+        )
+
+        # load localizer head
+        self.localizer.load_state_dict(
+            {k.replace("regressor.", ""): v for k, v in localizer_state.items() if k.startswith("regressor.")},
+            strict=False
+        )
+
+        # load segmentation decoder
+        self.load_state_dict(unet_state, strict=False)
 
         self.final_conv = nn.Conv2d(64, seg_classes, 1)
 

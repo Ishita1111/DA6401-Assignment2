@@ -3,6 +3,8 @@
 
 import torch
 import torch.nn as nn
+from models.vgg11 import VGG11Encoder
+
 
 class VGG11UNet(nn.Module):
     """U-Net style segmentation network.
@@ -22,19 +24,19 @@ class VGG11UNet(nn.Module):
 
         self.up4 = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)  # 28 → 56
         self.dec4 = nn.Sequential(
-            nn.Conv2d(256 + 256, 256, kernel_size=3, padding=1),
+            nn.Conv2d(256 + 512, 256, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
         )
 
         self.up3 = nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2)  # 56 → 112
         self.dec3 = nn.Sequential(
-            nn.Conv2d(128 + 128, 128, kernel_size=3, padding=1),
+            nn.Conv2d(128 + 256, 128, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
         )
 
         self.up2 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)  # 112 → 224
         self.dec2 = nn.Sequential(
-            nn.Conv2d(64 + 64, 64, kernel_size=3, padding=1),
+            nn.Conv2d(64 + 128, 64, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
         )
         

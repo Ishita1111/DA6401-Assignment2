@@ -28,7 +28,7 @@ class VGG11Classifier(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.encoder(x)
-        print("Encoder output:", type(x), x.shape if x is not None else None)
+        # print("Encoder output:", type(x), x.shape if x is not None else None)
         x = self.classifier(x)
         return x
 
