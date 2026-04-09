@@ -67,7 +67,11 @@ class VGG11Encoder(nn.Module):
             CustomDropout(p=0.3),
         )
 
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.pool1 = nn.MaxPool2d(2, 2)
+        self.pool2 = nn.MaxPool2d(2, 2)
+        self.pool3 = nn.MaxPool2d(2, 2)
+        self.pool4 = nn.MaxPool2d(2, 2)
+        self.pool5 = nn.MaxPool2d(2, 2)
 
     def forward(
         self, x: torch.Tensor, return_features: bool = False
@@ -88,28 +92,28 @@ class VGG11Encoder(nn.Module):
         # Block 1
         x = self.block1(x)
         features["block1"] = x
-        x = self.pool(x)
+        x = self.pool1(x)
 
         # Block 2
         x = self.block2(x)
         features["block2"] = x
-        x = self.pool(x)
+        x = self.pool2(x)
 
         # Block 3
         x = self.block3(x)
         features["block3"] = x
-        x = self.pool(x)
+        x = self.pool3(x)
 
         # Block 4
         x = self.block4(x)
         features["block4"] = x
-        x = self.pool(x)
+        x = self.pool4(x)
 
         # Block 5 (no pool after this if used as bottleneck)
         x = self.block5(x)
         features["block5"] = x
         
-        x = self.pool(x)  
+        x = self.pool5(x)  
 
         if return_features:
             return x, features

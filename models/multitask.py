@@ -35,9 +35,11 @@ class MultiTaskPerceptionModel(nn.Module):
         # Classification head
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(512 * 7 * 7, 1024),
+            nn.Linear(512 * 7 * 7, 4096),
             nn.ReLU(inplace=True),
-            nn.Linear(1024, num_breeds)
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_breeds)
         )
 
         # Localization head
