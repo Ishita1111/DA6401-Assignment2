@@ -12,28 +12,20 @@ class VGG11Classifier(nn.Module):
 
         self.encoder = VGG11Encoder(in_channels=in_channels)
 
+        # IMPORTANT: This head must match the provided checkpoint keys.
+        # (Linear layers at indices 1, 4, 7 inside `self.classifier`.)
         self.classifier = nn.Sequential(
             nn.Flatten(),
-
             nn.Linear(512 * 7 * 7, 4096),
             nn.ReLU(inplace=True),
             CustomDropout(p=dropout_p),
-
             nn.Linear(4096, 1024),
             nn.ReLU(inplace=True),
             CustomDropout(p=dropout_p),
-
-            nn.Linear(1024, num_classes)
+            nn.Linear(1024, num_classes),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.encoder(x)
-        # print("Encoder output:", type(x), x.shape if x is not None else None)
         x = self.classifier(x)
         return x
-
-model = VGG11Classifier()
-x = torch.randn(2, 3, 224, 224)
-
-out = model(x)
-print(out.shape)  # should be [2, 37]

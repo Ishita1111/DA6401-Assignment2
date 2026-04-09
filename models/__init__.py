@@ -8,7 +8,13 @@ from .localization import VGG11Localizer
 from .classification import VGG11Classifier
 from .segmentation import VGG11UNet
 from .vgg11 import VGG11Encoder
-from .multitask import MultiTaskPerceptionModel
+
+# Optional: `MultiTaskPerceptionModel` depends on `gdown` for checkpoint download.
+# Keep core model imports usable even when `gdown` isn't installed.
+try:
+    from .multitask import MultiTaskPerceptionModel
+except ModuleNotFoundError:
+    MultiTaskPerceptionModel = None
 
 __all__ = [
     "CustomDropout",
