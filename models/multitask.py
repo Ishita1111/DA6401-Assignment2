@@ -26,7 +26,7 @@ class MultiTaskPerceptionModel(nn.Module):
             gdown.download(id="1REslGGryB4ph8jFy4p9m0Je5OJ1JUhgC", output=localizer_path, quiet=False)
 
         if not os.path.exists(unet_path):
-            gdown.download(id="1J1gCdlC8tWJiwE7gBcCBQg5bWT_CFip", output=unet_path, quiet=False)
+            gdown.download(id="1J1gCdlC8tWJiwE7gBcCBQg5bWT_CFip-", output=unet_path, quiet=False)
 
         # ---------------- LOAD MODELS ----------------
         self.classifier_model = VGG11Classifier(num_breeds, in_channels)
