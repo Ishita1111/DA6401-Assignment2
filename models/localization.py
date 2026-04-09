@@ -16,15 +16,11 @@ class VGG11Localizer(nn.Module):
 
         self.regressor = nn.Sequential(
             nn.Flatten(),
-
             nn.Linear(512 * 7 * 7, 1024),
             nn.ReLU(inplace=True),
-
             nn.Linear(1024, 256),
             nn.ReLU(inplace=True),
-
-            nn.Linear(256, 4),
-            nn.Sigmoid()  # ensures outputs in [0, 1]
+            nn.Linear(256, 4)
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

@@ -45,10 +45,11 @@ class MultiTaskPerceptionModel(nn.Module):
         # Localization head
         self.localizer = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(512 * 7 * 7, 512),
+            nn.Linear(512 * 7 * 7, 1024),
             nn.ReLU(inplace=True),
-            nn.Linear(512, 4),
-            nn.Sigmoid()
+            nn.Linear(1024, 256),
+            nn.ReLU(inplace=True),
+            nn.Linear(256, 4)
         )
 
         # Segmentation decoder (same idea as UNet, but inline)
