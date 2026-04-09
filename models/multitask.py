@@ -59,23 +59,15 @@ class MultiTaskPerceptionModel(nn.Module):
         self.segmenter = VGG11UNet(seg_classes, in_channels)
         self.segmenter.load_state_dict(unet_state)
 
-    def forward(self, x: torch.Tensor):
-
-        # shared encoder
-        bottleneck, feats = self.encoder(x, return_features=True)
-
-        # classification
+    def forward(self, x):
+        
         cls_out = self.classifier_model(x)
+        bbox_out = self.localizer_model(x)
 
-        # localization
-        bbox_out = self.localizer(x)
-
-        # 🔥 FIX: scale bbox to image size
         _, _, H, W = x.shape
         scale = torch.tensor([W, H, W, H], device=bbox_out.device)
         bbox_out = bbox_out * scale
 
-        # segmentation (use full UNet)
         seg_out = self.segmenter(x)
 
         return {
