@@ -43,11 +43,12 @@ class MultiTaskPerceptionModel(nn.Module):
         self.localizer_model.load_state_dict(loc_ckpt.get("state_dict", loc_ckpt))
         self.segmenter.load_state_dict(seg_ckpt.get("state_dict", seg_ckpt))
 
+        # ---------------- SET TO EVAL MODE ----------------
+        self.classifier_model.eval()
+        self.localizer_model.eval()
+        self.segmenter.eval()
+
     def forward(self, x):
-        
-        mean = torch.tensor([0.485, 0.456, 0.406], device=x.device).view(1,3,1,1)
-        std = torch.tensor([0.229, 0.224, 0.225], device=x.device).view(1,3,1,1)
-        x = (x - mean) / std
 
         # ---------------- CLASSIFICATION ----------------
         cls_out = self.classifier_model(x)
@@ -55,7 +56,7 @@ class MultiTaskPerceptionModel(nn.Module):
         # ---------------- LOCALIZATION ----------------
         bbox_out = self.localizer_model(x)
         _, _, H, W = x.shape
-        scale = torch.tensor([W, H, W, H], device=bbox_out.device)
+        scale = torch.tensor([W, H, W, H], device=bbox_out.device, dtype=torch.float32)
         bbox_out = bbox_out * scale
 
         # ---------------- SEGMENTATION ----------------

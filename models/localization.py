@@ -24,6 +24,6 @@ class VGG11Localizer(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.encoder(x)      # [B, 512, 7, 7]
-        x = self.regressor(x)    # [B, 4]
-        return x
+        x = self.encoder(x)
+        x = self.regressor(x)
+        return torch.sigmoid(x)  # clamp output to 0-1 to match normalized targets

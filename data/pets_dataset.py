@@ -31,7 +31,7 @@ class OxfordIIITPetDataset(Dataset):
         ]
 
         # Build label map
-        breeds = sorted(list(set([f.split("_")[0] for f in self.image_files])))
+        breeds = sorted(list(set(["_".join(f.replace(".jpg", "").split("_")[:-1]) for f in self.image_files])))
         self.breed_to_idx = {b: i for i, b in enumerate(breeds)}
 
     def __len__(self):
@@ -62,7 +62,6 @@ class OxfordIIITPetDataset(Dataset):
 
         mask = np.array(mask)
 
-        # convert 1,2,3 → 0,1,2
         mask = mask - 1
 
         return torch.tensor(mask, dtype=torch.long)
@@ -86,7 +85,7 @@ class OxfordIIITPetDataset(Dataset):
             image = torch.tensor(np.array(image)).permute(2, 0, 1).float() / 255.0
 
         # label
-        breed = img_name.split("_")[0]
+        breed = "_".join(img_name.replace(".jpg", "").split("_")[:-1])
         label = self.breed_to_idx[breed]
 
         # bbox
